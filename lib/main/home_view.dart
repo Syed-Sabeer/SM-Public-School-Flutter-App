@@ -88,52 +88,57 @@ class HomeView extends StatelessWidget {
             ),
 
             // Grid of smaller cards
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // Show 3 cards in a row
-                crossAxisSpacing: 16.0,
-                mainAxisSpacing: 16.0,
-                childAspectRatio: 1.0, // Adjust aspect ratio for proper card size
+        GridView.builder(
+  shrinkWrap: true,
+  physics: const NeverScrollableScrollPhysics(),
+  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+    crossAxisCount: 3, // Show 3 cards in a row
+    crossAxisSpacing: 16.0,
+    mainAxisSpacing: 16.0,
+    childAspectRatio: 1.0, // Adjust aspect ratio for proper card size
+  ),
+  itemCount: 10, // Number of cards
+  itemBuilder: (context, index) {
+    return Card(
+      elevation: 6,
+      color:  const Color.fromARGB(255, 229, 235, 245) ,
+      // background color based on index
+        // color: index % 2 == 0 ? Colors.purple.shade50 : Colors.orange.shade50, 
+
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        onTap: () {
+          _navigateToFeature(context, index);
+        },
+        splashColor: Colors.purpleAccent.withOpacity(0.3),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              _getCardSvgPath(index),
+              height: 40,
+              width: 40,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _getCardTitle(index),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
               ),
-              itemCount: 8, // Number of cards
-              itemBuilder: (context, index) {
-                return Card(
-                  elevation: 6,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      _navigateToFeature(context, index);
-                    },
-                    splashColor: Colors.purpleAccent.withOpacity(0.3),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                    SvgPicture.asset(
-  _getCardSvgPath(index),
-  height: 40,
-  width: 40,
+            ),
+          ],
+        ),
+      ),
+    );
+  },
 ),
 
-                        const SizedBox(height: 8),
-                        Text(
-                          _getCardTitle(index),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+
           ],
         ),
       ),
@@ -166,7 +171,13 @@ class HomeView extends StatelessWidget {
         break;
       case 7:
         Navigator.push(context, MaterialPageRoute(builder: (context) => const ResultsView()));
-        break;
+        break; 
+         case 8:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const ResultsView()));
+        break; 
+         case 9:
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const ResultsView()));
+        break; 
       default:
         // Handle unknown case
         break;
@@ -177,23 +188,23 @@ class HomeView extends StatelessWidget {
   String _getCardSvgPath(int index) {
     switch (index) {
       case 0:
-        return 'assets/icons/work.svg';
+        return 'assets/images/dashboard/notice.svg';
       case 1:
-        return 'assets/icons/classes.svg';
+        return 'assets/images/dashboard/attendance.svg';
       case 2:
-        return 'assets/icons/homework.svg';
+        return 'assets/images/dashboard/homework.svg';
       case 3:
-        return 'assets/icons/attendance.svg';
+        return 'assets/images/dashboard/academiccalendar.svg';
       case 4:
         return 'assets/images/dashboard/timetable.svg';
       case 5:
-        return 'assets/icons/leaves.svg';
+        return 'assets/images/dashboard/feeledger.svg';
       case 6:
-        return 'assets/images/dashboard/.svg';
+        return 'assets/images/dashboard/feevoucher.svg';
       case 7:
-        return 'assets/images/dashboard/.svg';
+        return 'assets/images/dashboard/syllabus.svg';
         case 8:
-        return 'assets/images/dashboard/.svg';
+        return 'assets/images/dashboard/datesheet.svg';
         case 9:
         return 'assets/images/dashboard/result.svg';
       default:

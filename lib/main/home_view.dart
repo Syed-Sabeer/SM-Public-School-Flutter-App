@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../common_widgets/mini_card.dart';
+import '../main/inner_pages/attendace.dart';
+import '../main/inner_pages/time_table.dart';
+import '../main/inner_pages/syllabus.dart';
+import '../main/inner_pages/notice.dart';
+import '../main/inner_pages/leaves.dart';
+import '../main/inner_pages/homework.dart';
+import '../main/inner_pages/fee_voucher.dart';
+import '../main/inner_pages/fee_ledger.dart';
+import '../main/inner_pages/date_sheet.dart';
+import '../main/inner_pages/communication.dart';
+import '../main/inner_pages/result.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -7,302 +19,173 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purpleAccent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+          color: Colors.white,
         ),
         title: const Text(
-          'Home View',
+          'Dashboard',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.logout, color: Colors.red),
+          onPressed: () {
+            // Add logout functionality here
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home, color: Colors.blue),
+            onPressed: () {
+              // Add home button functionality here
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.group, color: Colors.blue),
+            onPressed: () {
+              // Add group button functionality here
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Main User Card
-            Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              margin: const EdgeInsets.only(bottom: 16.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Colors.purpleAccent, Colors.deepPurple],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Main User Card
+              Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.white,
-                        child: const Icon(
-                          Icons.person,
-                          size: 40,
-                          color: Colors.deepPurple,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'John Doe',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                margin: const EdgeInsets.only(bottom: 16.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 229, 235, 245),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 88,
+                          height: 88,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.blue,
+                              width: 4.0,
                             ),
                           ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Student | Class: 10 | Section: A',
-                            style: TextStyle(color: Colors.white70),
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundColor: Colors.white,
+                            child: ClipOval(
+                              child: SvgPicture.asset(
+                                'assets/images/dashboard/male_avatar.svg',
+                                fit: BoxFit.cover,
+                                width: 80,
+                                height: 80,
+                              ),
+                            ),
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Email: johndoe@example.com',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              'John Doe',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              ' Father: James Bond',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              ' Class: 10 - A',
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              ' ID: 2768',
+                              style: TextStyle(
+                                  color: Color.fromARGB(255, 123, 123, 123)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Grid of smaller cards
-        GridView.builder(
-  shrinkWrap: true,
-  physics: const NeverScrollableScrollPhysics(),
-  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 3, // Show 3 cards in a row
-    crossAxisSpacing: 16.0,
-    mainAxisSpacing: 16.0,
-    childAspectRatio: 1.0, // Adjust aspect ratio for proper card size
-  ),
-  itemCount: 10, // Number of cards
-  itemBuilder: (context, index) {
-    return Card(
-      elevation: 6,
-      color:  const Color.fromARGB(255, 229, 235, 245) ,
-      // background color based on index
-        // color: index % 2 == 0 ? Colors.purple.shade50 : Colors.orange.shade50, 
+              // Grid of smaller cards
+              MiniCardGrid(
+                  onCardTap: (context, index) =>
+                      _navigateToFeature(context, index)),
 
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: () {
-          _navigateToFeature(context, index);
-        },
-        splashColor: Colors.purpleAccent.withOpacity(0.3),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              _getCardSvgPath(index),
-              height: 40,
-              width: 40,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _getCardTitle(index),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  },
-),
-
-
-          ],
+              // Footer Row with Icons and Text
+            ],
+          ),
         ),
       ),
     );
   }
+
+ 
+ 
 
   // Navigation based on card index
   void _navigateToFeature(BuildContext context, int index) {
     switch (index) {
       case 0:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkView()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const NoticesView()));
         break;
       case 1:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ClassesView()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const AttendanceView()));
         break;
       case 2:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const NoticesView()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const HomeworkView()));
         break;
       case 3:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const AttendanceView()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const CommunicationView()));
         break;
       case 4:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeworkView()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const LeavesView()));
         break;
       case 5:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const LeavesView()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const FeeVoucherView()));
         break;
       case 6:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const TimeTableView()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const FeeLedgerView()));
         break;
       case 7:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ResultsView()));
-        break; 
-         case 8:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ResultsView()));
-        break; 
-         case 9:
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ResultsView()));
-        break; 
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ResultsView()));
+        break;
       default:
-        // Handle unknown case
+        // Handle unknown cases if needed
         break;
     }
-  }
-
-  // Helper function to get SVG path
-  String _getCardSvgPath(int index) {
-    switch (index) {
-      case 0:
-        return 'assets/images/dashboard/notice.svg';
-      case 1:
-        return 'assets/images/dashboard/attendance.svg';
-      case 2:
-        return 'assets/images/dashboard/homework.svg';
-      case 3:
-        return 'assets/images/dashboard/academiccalendar.svg';
-      case 4:
-        return 'assets/images/dashboard/timetable.svg';
-      case 5:
-        return 'assets/images/dashboard/feeledger.svg';
-      case 6:
-        return 'assets/images/dashboard/feevoucher.svg';
-      case 7:
-        return 'assets/images/dashboard/syllabus.svg';
-        case 8:
-        return 'assets/images/dashboard/datesheet.svg';
-        case 9:
-        return 'assets/images/dashboard/result.svg';
-      default:
-        return 'assets/icons/unknown.svg';
-    }
-  }
-
-  // Helper function to get card title
-  String _getCardTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'Notice';
-      case 1:
-        return 'Attendace';
-      case 2:
-        return 'Homework';
-      case 3:
-        return 'Academic Calendar';
-      case 4:
-        return 'Time Table';
-      case 5:
-        return 'Fee Ledger';
-      case 6:
-        return 'Fee Voucher';
-      case 7:
-        return 'Syllabus';
-        case 8:
-        return 'Datesheet';
-        case 9:
-        return 'Result';
-      default:
-        return 'Unknown';
-    }
-  }
-}
-
-// Example Views
-class WorkView extends StatelessWidget {
-  const WorkView({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Work View")));
-  }
-}
-
-class ClassesView extends StatelessWidget {
-  const ClassesView({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Classes View")));
-  }
-}
-
-// Define other views similarly...
-class NoticesView extends StatelessWidget {
-  const NoticesView({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Notices View")));
-  }
-}
-
-class AttendanceView extends StatelessWidget {
-  const AttendanceView({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Attendance View")));
-  }
-}
-
-class HomeworkView extends StatelessWidget {
-  const HomeworkView({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Homework View")));
-  }
-}
-
-class LeavesView extends StatelessWidget {
-  const LeavesView({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Leaves View")));
-  }
-}
-
-class TimeTableView extends StatelessWidget {
-  const TimeTableView({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Time Table View")));
-  }
-}
-
-class ResultsView extends StatelessWidget {
-  const ResultsView({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: const Text("Results View")));
   }
 }

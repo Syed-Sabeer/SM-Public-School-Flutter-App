@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class MiniCardGrid extends StatelessWidget {
   final void Function(BuildContext context, int index) onCardTap;
 
-  const MiniCardGrid({Key? key, required this.onCardTap}) : super(key: key);
+  const MiniCardGrid({super.key, required this.onCardTap});
 
   @override
   Widget build(BuildContext context) {

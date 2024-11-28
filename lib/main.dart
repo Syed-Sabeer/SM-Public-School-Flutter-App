@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
-import './main/home_view.dart'; 
+import 'package:firebase_core/firebase_core.dart'; // Import Firebase core package
+// Import Home View
+import './auth/signin.dart'; // Import Sign In View
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Ensures proper initialization of bindings for async operations
+  await Firebase.initializeApp(); // Initialize Firebase services
+  runApp(const MyApp()); // Run the app
 }
 
 class MyApp extends StatelessWidget {
@@ -11,13 +15,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-       debugShowCheckedModeBanner: false,
-      title: 'SM Public School',
+      debugShowCheckedModeBanner: false, // Disable debug banner
+      title: 'SM Public School', // App title
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple), // Set theme color
+        useMaterial3: true, // Enable Material 3 design
       ),
-      home: const HomeView(), // Set HomeView as the home widget
+      home: SignInView(), // Initial screen set to SignInView
     );
   }
 }

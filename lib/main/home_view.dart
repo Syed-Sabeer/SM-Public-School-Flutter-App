@@ -14,7 +14,14 @@ import '../main/inner_pages/communication.dart';
 import '../main/inner_pages/result.dart';
 
 class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+  final String fullName;
+  final String studentId;
+
+  const HomeView({
+    super.key,
+    required this.fullName,
+    required this.studentId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,15 +31,15 @@ class HomeView extends StatelessWidget {
         flexibleSpace: Container(
           color: Colors.white,
         ),
-        title: const Text(
+         title: const Text(
           'Dashboard',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.logout, color: Colors.red),
+          icon: const Icon(Icons.logout, color: Colors.red),  // Use back arrow icon
           onPressed: () {
-            // Add logout functionality here
+            Navigator.pop(context);  // Go back to the previous screen
           },
         ),
         actions: [
@@ -57,7 +64,7 @@ class HomeView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Main User Card
+              // Main User Card with dynamic data
               Card(
                 elevation: 8,
                 shape: RoundedRectangleBorder(
@@ -99,29 +106,29 @@ class HomeView extends StatelessWidget {
                         const SizedBox(width: 16),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text(
-                              'John Doe',
-                              style: TextStyle(
+                              fullName, // Display the full name dynamically
+                              style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              ' Father: James Bond',
-                              style: TextStyle(color: Colors.black),
+                              ' Father: James Bond', // You can pass or fetch father's name dynamically
+                              style: const TextStyle(color: Colors.black),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
-                              ' Class: 10 - A',
-                              style: TextStyle(color: Colors.black),
+                              ' Class: 10 - A', // Class and Section can be dynamic as well if needed
+                              style: const TextStyle(color: Colors.black),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
-                              ' ID: 2768',
-                              style: TextStyle(
+                              ' ID: $studentId', // Display the student ID dynamically
+                              style: const TextStyle(
                                   color: Color.fromARGB(255, 123, 123, 123)),
                             ),
                           ],
@@ -144,9 +151,6 @@ class HomeView extends StatelessWidget {
       ),
     );
   }
-
- 
- 
 
   // Navigation based on card index
   void _navigateToFeature(BuildContext context, int index) {

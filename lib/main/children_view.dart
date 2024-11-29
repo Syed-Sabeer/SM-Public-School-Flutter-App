@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firebase Firestore
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:intl/intl.dart'; 
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firebase Firestore
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth
 import 'package:firebase_core/firebase_core.dart'; // Firebase Initialization
 import '../presentation/theme/colortheme.dart';
-import '../common_widgets/childDetail_card.dart'; // Import the new file
-import '../auth/signin.dart'; // Make sure this is your SignInView import
+import '../common_widgets/childDetail_card.dart';
+import '../auth/signin.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Initialize Firebase
-  runApp(ChildrenView());
+  runApp(const ChildrenView());
 }
 
 class ChildrenView extends StatefulWidget {
@@ -20,81 +21,102 @@ class ChildrenView extends StatefulWidget {
 }
 
 class _ChildrenViewState extends State<ChildrenView> {
-  int currentIndex = 0; // To track the active page
-  List<Map<String, dynamic>> studentDetails = []; // To hold fetched student data
-  List<Color> colors = [Cpink, Cblue, Cyellow]; // Cycle colors
+  int currentIndex = 0;
+  List<Map<String, dynamic>> studentDetails = [];
+  List<Map<String, dynamic>> notices = []; // To hold notices
+  List<Color> colors = [Cpink, Cblue, Cyellow];
 
   @override
   void initState() {
     super.initState();
-    fetchStudents(); // Fetch student records dynamically
+    fetchStudents();
+    fetchNotices(); // Fetch notices
   }
 
   Future<void> fetchStudents() async {
-    try {
-      final authUser = FirebaseAuth.instance.currentUser; // Current logged-in user
-      if (authUser == null) return;
+  try {
+    final authUser = FirebaseAuth.instance.currentUser;
+    if (authUser == null) return;
 
-      final authId = authUser.uid;
+    final authId = authUser.uid;
+    final secondarySnapshot = await FirebaseFirestore.instance
+        .collection('student_secondary_detail')
+        .where('authId', isEqualTo: authId)
+        .get();
 
-      // Fetch `student_secondary_detail` where `authId` matches
-      final secondarySnapshot = await FirebaseFirestore.instance
-          .collection('student_secondary_detail')
-          .where('authId', isEqualTo: authId)
-          .get();
+    if (secondarySnapshot.docs.isEmpty) {
+      return;
+    }
 
-      print('student_secondary_detail query result: ${secondarySnapshot.docs.length} documents found.');
+    final fatherCnic = secondarySnapshot.docs.first['fathercnic'];
+    final studentSnapshot = await FirebaseFirestore.instance
+        .collection('student_detail')
+        .where('fathercnic', isEqualTo: fatherCnic)
+        .orderBy('createdAt')
+        .get();
 
-      if (secondarySnapshot.docs.isEmpty) {
-        print('No student_secondary_detail found for this user.');
-        return;
+    if (studentSnapshot.docs.isNotEmpty) {
+      List<Map<String, dynamic>> students = [];
+      for (var i = 0; i < studentSnapshot.docs.length; i++) {
+        final data = studentSnapshot.docs[i].data();
+        
+        // Convert the dob field from Timestamp to String
+        final Timestamp dobTimestamp = data['dob'];
+        final String formattedDob = DateFormat('dd-MMM-yyyy').format(dobTimestamp.toDate());
+
+        students.add({
+          'name': data['fullname'],
+          'className': data['class'],
+          'section': data['section'],
+          'dob': formattedDob, // Use the formatted DOB
+          'fathercnic': data['fathercnic'],
+          'idNumber': data['idNumber'],
+          'color': colors[i % colors.length],
+        });
       }
+      setState(() {
+        studentDetails = students;
+      });
+    }
+  } catch (e) {
+    print("Error fetching students: $e");
+  }
+}
 
-      final fatherCnic = secondarySnapshot.docs.first['fathercnic'];
-
-      print('fathercnic: $fatherCnic');
-
-      // Fetch `student_detail` where `fathercnic` matches
-      final studentSnapshot = await FirebaseFirestore.instance
-          .collection('student_detail')
-          .where('fathercnic', isEqualTo: fatherCnic)
-          .orderBy('createdAt') // Order by creation time
+  Future<void> fetchNotices() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('global_notice')
+          .orderBy('createdAt', descending: true)
           .get();
 
-      print('student_detail query result: ${studentSnapshot.docs.length} documents found.');
-
-      if (studentSnapshot.docs.isNotEmpty) {
-        List<Map<String, dynamic>> students = [];
-        for (var i = 0; i < studentSnapshot.docs.length; i++) {
-          final data = studentSnapshot.docs[i].data();
-          students.add({
-            'name': data['fullname'],
-            'className': data['class'],
-            'section': data['section'],
-            'cnic': data['cnic'],
-            'fathercnic': data['fathercnic'],
-            'idNumber': data['idNumber'],
-            'color': colors[i % colors.length], // Assign color in sequence
+      if (snapshot.docs.isNotEmpty) {
+        List<Map<String, dynamic>> fetchedNotices = [];
+        for (var doc in snapshot.docs) {
+          final data = doc.data();
+          final Timestamp timestamp = data['createdAt'];
+          final String formattedDate = DateFormat('dd-MMM-yyyy').format(timestamp.toDate()); // Format date.
+          fetchedNotices.add({
+            'date': formattedDate,
+            'subject': data['subject'],
+            'body': data['body'],
           });
         }
         setState(() {
-          studentDetails = students; // Update state with fetched students
+          notices = fetchedNotices;
         });
-      } else {
-        print('No students found for fathercnic: $fatherCnic');
       }
     } catch (e) {
-      print("Error fetching students: $e");
+      print("Error fetching notices: $e");
     }
   }
 
-  // Function to log out the user and restart the app from main.dart
   void _logout() async {
-    await FirebaseAuth.instance.signOut(); // Log out the user
+    await FirebaseAuth.instance.signOut();
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => SignInView()), // Navigate to SignInView after logout
-      (Route<dynamic> route) => false, // Remove all previous routes
+      MaterialPageRoute(builder: (context) => const SignInView()),
+      (Route<dynamic> route) => false,
     );
   }
 
@@ -102,80 +124,156 @@ class _ChildrenViewState extends State<ChildrenView> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-   
- home: Scaffold(
-  appBar: AppBar(
-    title: const Text(
-      'Student Detail',
-      style: TextStyle(
-        color: Colors.black, 
-        fontSize: 18,
-        fontWeight: FontWeight.bold, // Make the text bold
-      ),
-    ),
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    automaticallyImplyLeading: false, // Remove default back button
-    actions: [
-      IconButton(
-        icon: const Icon(
-          Icons.power_settings_new, // Power icon for logout
-          color: Colors.red,
-          size: 28, // Adjust size as needed
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Student Detail',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.power_settings_new,
+                color: Colors.red,
+                size: 28,
+              ),
+              onPressed: _logout,
+            ),
+          ],
         ),
-        onPressed: _logout, // Logout functionality
-      ),
-    ],
-  ),
 
         body: studentDetails.isEmpty
-            ? const Center(child: CircularProgressIndicator()) // Show loader
-            : Column(
-                children: [
-                  Expanded(
-                    child: PageView.builder(
-                      itemCount: studentDetails.length,
-                      onPageChanged: (index) {
-                        setState(() {
-                          currentIndex = index;
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        final student = studentDetails[index];
-                        return buildStudentCard(
-                          context: context, // Pass the context here
-                          name: student['name'],
-                          className: student['className'],
-                          section: student['section'],
-                          cnic: student['cnic'],
-                          fathercnic: student['fathercnic'],
-                          idNumber: student['idNumber'],
-                          color: student['color'],
-                        );
-                      },
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(  // Wrap the entire body in a SingleChildScrollView
+                child: Column(
+                  children: [
+                    // Student Cards Section
+                    SizedBox(
+                      height: 380,  // Adjust the height of the student cards section
+                      child: PageView.builder(
+                        itemCount: studentDetails.length,
+                        onPageChanged: (index) {
+                          setState(() {
+                            currentIndex = index;
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          final student = studentDetails[index];
+                          return buildStudentCard(
+                            context: context,
+                            name: student['name'],
+                            className: student['className'],
+                            section: student['section'],
+                            dob: student['dob'],
+                            fathercnic: student['fathercnic'],
+                            idNumber: student['idNumber'],
+                            color: student['color'],
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  // Dots Indicator
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      studentDetails.length,
-                      (index) => AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        height: 8,
-                        width: currentIndex == index ? 16 : 8,
-                        decoration: BoxDecoration(
-                          color: currentIndex == index
-                              ? studentDetails[index]['color']
-                              : Colors.grey,
-                          borderRadius: BorderRadius.circular(8),
+                    
+                    // Slider Dots 
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        studentDetails.length,
+                        (index) => AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          margin: const EdgeInsets.only(left: 4, right: 4, top: 10),
+                          height: 8,
+                          width: currentIndex == index ? 16 : 8,
+                          decoration: BoxDecoration(
+                            color: currentIndex == index
+                                ? studentDetails[index]['color']
+                                : Colors.grey,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                    const SizedBox(height: 20),
+
+                    // Notice Section
+                    Padding(
+                       padding: const EdgeInsets.only(top: 32, left: 16, right: 16), 
+                      child: Column(
+                        children: [
+                          // Add the heading at the top
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Text(
+                              "Notices", // Notice heading
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center, // Center the heading
+                            ),
+                          ),
+                          
+                          // ListView for displaying notices
+                          ListView(
+                            shrinkWrap: true,  // Prevents the ListView from taking all available space
+                            physics: const NeverScrollableScrollPhysics(),  // Disables scrolling inside ListView
+                            children: notices.map((notice) {
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 12),
+                                elevation: 4,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        notice['date'],
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        notice['subject'],
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        notice['body'],
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black87,
+                                        ),
+                                        softWrap: true,  // Allow text to wrap
+                                        overflow: TextOverflow.ellipsis,  // Add "..." if text overflows
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
       ),
     );

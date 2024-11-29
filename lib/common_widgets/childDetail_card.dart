@@ -1,82 +1,82 @@
-// student_card_widget.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../main/home_view.dart'; // Make sure to import the HomeView file
-
-// You can also import any custom files like color themes or images.
+import '../main/home_view.dart'; // Ensure to import the HomeView file
 
 Widget buildStudentCard({
   required BuildContext context, // Add BuildContext parameter
   required String name,
   required String className,
   required String section,
-  required String cnic,
+  required String dob,
   required String fathercnic,
   required String idNumber,
   required Color color,
 }) {
   return Container(
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 23),
     child: Center(
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 8,
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+        child: SingleChildScrollView( // Ensure the content scrolls if needed
+          child: Column(
+            mainAxisSize: MainAxisSize.min,  // This will allow the Column to take only as much height as needed
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                padding: const EdgeInsets.all(16),
+                child: SvgPicture.asset(
+                  'assets/images/dashboard/male_avatar.svg',
+                  width: 80,
+                  height: 80,
+                ),
               ),
-              padding: const EdgeInsets.all(16),
-              child: SvgPicture.asset(
-                'assets/images/dashboard/male_avatar.svg', // Replace with your SVG file path
-                width: 80,
-                height: 80,
+              const SizedBox(height: 8),
+              Text(
+                name,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              name,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-            buildInfoRow("Class ", "$className - $section"),
-            buildInfoRow("CNIC", cnic),
-            buildInfoRow("ID Number", idNumber),
-            const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              buildInfoRow("Class", "$className - $section"),
+              buildInfoRow("Date of Birth", dob),
+              buildInfoRow("ID Number", idNumber),
+              const SizedBox(height: 16),
 
-            // View Dashboard Button
-            ElevatedButton(
-              onPressed: () {
-                // Navigate to HomeView with student details
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeView(
-                      fullName: name, // Pass student's full name
-                      studentId: idNumber, // Pass student's ID number
-                    ),
+              // Add extra padding or margin here to ensure the button is visible
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0), // Add bottom padding here
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomeView(
+                          fullName: name,
+                          studentId: idNumber,
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                   ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: color,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8), // Minimized height
+                  child: const Text(
+                    "View Dashboard",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
               ),
-              child: const Text(
-                "View Dashboard",
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
+            ],
+          ),
         ),
       ),
     ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import '../main/children_view.dart'; // Import your ChildrenView page
+import '../main/controller/auth_controller.dart'; // Import the AuthController
 
 class SignInView extends StatefulWidget {
   const SignInView({super.key});
@@ -10,7 +11,6 @@ class SignInView extends StatefulWidget {
 }
 
 class _SignInViewState extends State<SignInView> {
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Firebase instance
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -33,13 +33,13 @@ class _SignInViewState extends State<SignInView> {
     });
 
     try {
-      // Authenticate with Firebase
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      // Authenticate with Firebase using AuthController
+      await AuthController().signIn(email, password);
 
       // Redirect to ChildrenView on successful login
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => ChildrenView()),
+        MaterialPageRoute(builder: (context) => const ChildrenView()),
       );
     } on FirebaseAuthException catch (e) {
       String errorMessage = e.message ?? "Login failed. Please try again.";
@@ -93,7 +93,6 @@ class _SignInViewState extends State<SignInView> {
                 ),
               ),
               const SizedBox(height: 40.0),
-              // Title
               const Text(
                 "Let's Sign in",
                 style: TextStyle(
@@ -111,7 +110,6 @@ class _SignInViewState extends State<SignInView> {
                 ),
               ),
               const SizedBox(height: 40.0),
-              // Username Input
               TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(
@@ -126,7 +124,6 @@ class _SignInViewState extends State<SignInView> {
                 ),
               ),
               const SizedBox(height: 20.0),
-              // Password Input
               TextField(
                 controller: _passwordController,
                 obscureText: true,
@@ -143,7 +140,6 @@ class _SignInViewState extends State<SignInView> {
                 ),
               ),
               const SizedBox(height: 25.0),
-              // Sign In Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -153,7 +149,7 @@ class _SignInViewState extends State<SignInView> {
                           _signIn(context);
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF002D62), // Deep blue
+                    backgroundColor: const Color(0xFF002D62), 
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
@@ -172,7 +168,6 @@ class _SignInViewState extends State<SignInView> {
                 ),
               ),
               const SizedBox(height: 30.0),
-              // Terms and Conditions
               const Center(
                 child: Text(
                   "By logging in, you agree to our\nTerms & Condition & Privacy Policy",

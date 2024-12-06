@@ -12,50 +12,32 @@ import '../main/inner_pages/fee_ledger.dart';
 import '../main/inner_pages/date_sheet.dart';
 import '../main/inner_pages/communication.dart';
 import '../main/inner_pages/result.dart';
+import './widgets/app_bar.dart';
+
 
 class HomeView extends StatelessWidget {
   final String fullName;
   final String studentId;
+  final String fatherName; // Add the father's name
+  final String className; // Add class and section
+  final String section;
 
   const HomeView({
     super.key,
     required this.fullName,
     required this.studentId,
+     required this.fatherName,  // Add this parameter
+    required this.className,   // Add this parameter
+    required this.section,     // Add 
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        flexibleSpace: Container(
-          color: Colors.white,
-        ),
-         title: const Text(
-          'Dashboard',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.logout, color: Colors.red),  // Use back arrow icon
-          onPressed: () {
-            Navigator.pop(context);  // Go back to the previous screen
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home, color: Colors.blue),
-            onPressed: () {
-              // Add home button functionality here
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.group, color: Colors.blue),
-            onPressed: () {
-              // Add group button functionality here
-            },
-          ),
-        ],
+      appBar: const CustomAppBar(
+        title: 'Dashboard',
+        isDashboard: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -115,14 +97,14 @@ class HomeView extends StatelessWidget {
                                 color: Colors.black,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                           const SizedBox(height: 2),
                             Text(
-                              ' Father: James Bond', // You can pass or fetch father's name dynamically
+                              ' Father: $fatherName', // Display father's name dynamically
                               style: const TextStyle(color: Colors.black),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              ' Class: 10 - A', // Class and Section can be dynamic as well if needed
+                              ' Class: $className - $section', // Display class and section dynamically
                               style: const TextStyle(color: Colors.black),
                             ),
                             const SizedBox(height: 4),
@@ -153,15 +135,23 @@ class HomeView extends StatelessWidget {
   }
 
   // Navigation based on card index
-  void _navigateToFeature(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const NoticesView()));
-        break;
-      case 1:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const AttendanceView()));
+void _navigateToFeature(BuildContext context, int index) {
+  switch (index) {
+    case 0: // NoticesView
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NoticesView(studentId: studentId), // Pass studentId
+        ),
+      );
+      break;
+      case 7:
+       Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TimeTableView(className:className), // Pass studentId
+        ),
+      );
         break;
       case 2:
         Navigator.push(context,
@@ -183,10 +173,15 @@ class HomeView extends StatelessWidget {
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const FeeLedgerView()));
         break;
-      case 7:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const ResultsView()));
-        break;
+      case 10:
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ResultView(studentId: studentId),
+    ),
+  );
+  break;
+
       default:
         // Handle unknown cases if needed
         break;

@@ -9,6 +9,7 @@ Widget buildStudentCard({
   required String section,
   required String dob,
   required String fathercnic,
+  required String fathername,
   required String idNumber,
   required Color color,
 }) {
@@ -53,27 +54,31 @@ Widget buildStudentCard({
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0), // Add bottom padding here
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HomeView(
-                          fullName: name,
-                          studentId: idNumber,
-                        ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: color,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  ),
-                  child: const Text(
-                    "View Dashboard",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
-                ),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => HomeView(
+            fullName: name,  // Pass the name directly
+            studentId: idNumber,  // Pass the student ID directly
+            fatherName: fathername,  // Replace this with the actual father's name if available
+            className: className,  // Pass the class name directly
+            section: section,  // Pass the section directly
+          ),
+      ),
+    );
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: color,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+  ),
+  child: const Text(
+    "View Dashboard",
+    style: TextStyle(fontSize: 16, color: Colors.white),
+  ),
+)
+
               ),
             ],
           ),

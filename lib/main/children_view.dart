@@ -23,65 +23,65 @@ class ChildrenView extends StatefulWidget {
 class _ChildrenViewState extends State<ChildrenView> {
   int currentIndex = 0;
   List<Map<String, dynamic>> studentDetails = [];
-  List<Map<String, dynamic>> notices = []; // To hold notices
+  List<Map<String, dynamic>> notices = [];
   List<Color> colors = [Cpink, Cblue, Cyellow];
 
   @override
   void initState() {
     super.initState();
     fetchStudents();
-    fetchNotices(); // Fetch notices
+    fetchNotices();
   }
 
   Future<void> fetchStudents() async {
-  try {
-    final authUser = FirebaseAuth.instance.currentUser;
-    if (authUser == null) return;
+    try {
+      final authUser = FirebaseAuth.instance.currentUser;
+      if (authUser == null) return;
 
-    final authId = authUser.uid;
-    final secondarySnapshot = await FirebaseFirestore.instance
-        .collection('student_secondary_detail')
-        .where('authId', isEqualTo: authId)
-        .get();
+      final authId = authUser.uid;
+      final secondarySnapshot = await FirebaseFirestore.instance
+          .collection('student_secondary_detail')
+          .where('authId', isEqualTo: authId)
+          .get();
 
-    if (secondarySnapshot.docs.isEmpty) {
-      return;
-    }
+      if (secondarySnapshot.docs.isEmpty) return;
 
-    final fatherCnic = secondarySnapshot.docs.first['fathercnic'];
-    final studentSnapshot = await FirebaseFirestore.instance
-        .collection('student_detail')
-        .where('fathercnic', isEqualTo: fatherCnic)
-        .orderBy('createdAt')
-        .get();
+      final secondaryData = secondarySnapshot.docs.first.data();
+      final String fatherCnic = secondaryData['fathercnic'] ?? '';
+      final String fatherName = secondaryData['fathername'] ?? 'Unknown';
 
-    if (studentSnapshot.docs.isNotEmpty) {
-      List<Map<String, dynamic>> students = [];
-      for (var i = 0; i < studentSnapshot.docs.length; i++) {
-        final data = studentSnapshot.docs[i].data();
-        
-        // Convert the dob field from Timestamp to String
-        final Timestamp dobTimestamp = data['dob'];
-        final String formattedDob = DateFormat('dd-MMM-yyyy').format(dobTimestamp.toDate());
+      final studentSnapshot = await FirebaseFirestore.instance
+          .collection('student_detail')
+          .where('fathercnic', isEqualTo: fatherCnic)
+          .orderBy('createdAt')
+          .get();
 
-        students.add({
-          'name': data['fullname'],
-          'className': data['class'],
-          'section': data['section'],
-          'dob': formattedDob, // Use the formatted DOB
-          'fathercnic': data['fathercnic'],
-          'idNumber': data['idNumber'],
-          'color': colors[i % colors.length],
+      if (studentSnapshot.docs.isNotEmpty) {
+        List<Map<String, dynamic>> students = [];
+        for (var i = 0; i < studentSnapshot.docs.length; i++) {
+          final data = studentSnapshot.docs[i].data();
+          final Timestamp dobTimestamp = data['dob'];
+          final String formattedDob = DateFormat('dd-MMM-yyyy').format(dobTimestamp.toDate());
+
+          students.add({
+            'name': data['fullname'],
+            'className': data['class'],
+            'section': data['section'],
+            'dob': formattedDob,
+            'fathercnic': data['fathercnic'],
+            'fathername': fatherName,
+            'idNumber': data['idNumber'],
+            'color': colors[i % colors.length],
+          });
+        }
+        setState(() {
+          studentDetails = students;
         });
       }
-      setState(() {
-        studentDetails = students;
-      });
+    } catch (e) {
+      print("Error fetching students: $e");
     }
-  } catch (e) {
-    print("Error fetching students: $e");
   }
-}
 
   Future<void> fetchNotices() async {
     try {
@@ -95,7 +95,7 @@ class _ChildrenViewState extends State<ChildrenView> {
         for (var doc in snapshot.docs) {
           final data = doc.data();
           final Timestamp timestamp = data['createdAt'];
-          final String formattedDate = DateFormat('dd-MMM-yyyy').format(timestamp.toDate()); // Format date.
+          final String formattedDate = DateFormat('dd-MMM-yyyy').format(timestamp.toDate());
           fetchedNotices.add({
             'date': formattedDate,
             'subject': data['subject'],
@@ -148,15 +148,14 @@ class _ChildrenViewState extends State<ChildrenView> {
             ),
           ],
         ),
-
         body: studentDetails.isEmpty
             ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(  // Wrap the entire body in a SingleChildScrollView
+            : SingleChildScrollView(
                 child: Column(
                   children: [
                     // Student Cards Section
                     SizedBox(
-                      height: 380,  // Adjust the height of the student cards section
+                      height: 380,
                       child: PageView.builder(
                         itemCount: studentDetails.length,
                         onPageChanged: (index) {
@@ -173,14 +172,15 @@ class _ChildrenViewState extends State<ChildrenView> {
                             section: student['section'],
                             dob: student['dob'],
                             fathercnic: student['fathercnic'],
+                            fathername: student['fathername'],
                             idNumber: student['idNumber'],
                             color: student['color'],
                           );
                         },
                       ),
                     ),
-                    
-                    // Slider Dots 
+
+                    // Slider Dots
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(
@@ -203,27 +203,24 @@ class _ChildrenViewState extends State<ChildrenView> {
 
                     // Notice Section
                     Padding(
-                       padding: const EdgeInsets.only(top: 32, left: 16, right: 16), 
+                      padding: const EdgeInsets.only(top: 32, left: 16, right: 16),
                       child: Column(
                         children: [
-                          // Add the heading at the top
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: Text(
-                              "Notices", // Notice heading
+                              "Notices",
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
-                              textAlign: TextAlign.center, // Center the heading
+                              textAlign: TextAlign.center,
                             ),
                           ),
-                          
-                          // ListView for displaying notices
                           ListView(
-                            shrinkWrap: true,  // Prevents the ListView from taking all available space
-                            physics: const NeverScrollableScrollPhysics(),  // Disables scrolling inside ListView
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
                             children: notices.map((notice) {
                               return Card(
                                 margin: const EdgeInsets.symmetric(vertical: 12),
@@ -260,8 +257,6 @@ class _ChildrenViewState extends State<ChildrenView> {
                                           fontSize: 14,
                                           color: Colors.black87,
                                         ),
-                                        softWrap: true,  // Allow text to wrap
-                                        overflow: TextOverflow.ellipsis,  // Add "..." if text overflows
                                       ),
                                     ],
                                   ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../main/home_view.dart'; // Ensure to import the HomeView file
+import '../home_view.dart'; // Ensure to import the HomeView file
 
 Widget buildStudentCard({
   required BuildContext context, // Add BuildContext parameter

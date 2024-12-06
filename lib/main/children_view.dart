@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // Firebase Firestore
 import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth
 import 'package:firebase_core/firebase_core.dart'; // Firebase Initialization
 import '../presentation/theme/colortheme.dart';
-import '../common_widgets/childDetail_card.dart';
+import 'widgets/childDetail_card.dart';
 import '../auth/signin.dart';
 
 void main() async {

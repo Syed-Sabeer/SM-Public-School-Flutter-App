@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import './controller/student_notice_controller.dart';
 import './sub_inner_pages/notice_view.dart';
-import '../widgets/app_bar.dart'; // Import the custom AppBar widget
+import '../widgets/app_bar.dart';
 
 class NoticesView extends StatefulWidget {
   final String studentId;
@@ -47,13 +47,22 @@ class _NoticesViewState extends State<NoticesView> {
       appBar: const CustomAppBar(
         title: 'Notices',
         isDashboard: false,
-      ), // Using the reusable AppBar
+      ),
       backgroundColor: Colors.white,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : notices.isEmpty
-              ? const Center(child: Text('No notices found.'))
+              ? const Center(
+                  child: Text(
+                    'No notices found.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                )
               : ListView.builder(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: notices.length,
                   itemBuilder: (context, index) {
                     final notice = notices[index];
@@ -72,11 +81,17 @@ class _NoticesViewState extends State<NoticesView> {
                         );
                       },
                       child: Card(
-                        elevation: 4,
+                        elevation: 5,
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16),
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        shadowColor: Colors.black26,
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -84,31 +99,36 @@ class _NoticesViewState extends State<NoticesView> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    notice['subject'] ?? 'No Subject',
-                                    style: const TextStyle(
+                                  Flexible(
+                                    child: Text(
+                                      notice['subject'] ?? 'No Subject',
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16),
+                                        fontSize: 18,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
+                                  const SizedBox(width: 8),
                                   Text(
                                     DateFormat('MMM dd, yyyy').format(
                                       (notice['createdAt'] as Timestamp)
                                           .toDate(),
                                     ),
                                     style: const TextStyle(
-                                      color: Colors.black54,
+                                      color: Colors.grey,
                                       fontSize: 14,
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 12),
                               Text(
                                 notice['body'] ?? 'No Content',
-                                maxLines: 1,
+                                maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
-                                  color: Colors.grey,
+                                  color: Colors.black87,
                                   fontSize: 14,
                                 ),
                               ),
@@ -122,4 +142,3 @@ class _NoticesViewState extends State<NoticesView> {
     );
   }
 }
-

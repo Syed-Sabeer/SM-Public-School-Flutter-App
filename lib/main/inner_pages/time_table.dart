@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_bar.dart';
 import 'package:intl/intl.dart';
-import '../controller/timetable_controller.dart';
+import 'controller/student_timetable_controller.dart';
 
 class TimeTableView extends StatefulWidget {
   final String className;

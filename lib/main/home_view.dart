@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../common_widgets/mini_card.dart';
+import 'widgets/mini_card.dart';
 import '../main/inner_pages/attendace.dart';
 import '../main/inner_pages/time_table.dart';
 import '../main/inner_pages/syllabus.dart';

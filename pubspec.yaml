@@ -16,6 +16,10 @@ dependencies:
   firebase_auth: ^5.3.3
   cloud_firestore: ^5.5.0
   intl: ^0.20.1
+  path_provider: ^2.1.0
+  pdf: ^3.10.8 # Latest version for creating PDFs
+  printing: ^5.12.0 # For saving and printing the PDF
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

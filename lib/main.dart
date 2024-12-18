@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import './auth/signin.dart'; 
 import './main/children_view.dart'; 
 import './main/controller/auth_controller.dart'; 
+import './pf.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); 

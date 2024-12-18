@@ -15,89 +15,62 @@ class FeeVoucherWidget extends StatelessWidget {
     required this.feeCycle,
     required this.voucherAmount,
     required this.paidDate,
-    this.isPaid = false,
+    required this.isPaid,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      margin: const EdgeInsets.all(8),
       elevation: 4,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border(
-            left: BorderSide(
-              color: isPaid ? Colors.green : Colors.red,
-              width: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildColumn('Invoice Date', invoiceDate),
+                _buildColumn('Due Date', dueDate),
+              ],
             ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Row - Invoice Date and Due Date
-            Row(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildDetail('Invoice Date', invoiceDate),
-                _buildDetail('Due Date', dueDate),
+                _buildColumn('Fee Cycle', feeCycle),
+                _buildColumn('Voucher Amount', voucherAmount),
               ],
             ),
-            const SizedBox(height: 8),
-
-            // Middle Row - Fee Cycle and Voucher Amount
-            Row(
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildDetail('Fee Cycle', feeCycle, bold: true),
-                _buildDetail('Voucher Amount', voucherAmount, bold: true),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // Download Button and Paid Date
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle download logic here
-                  },
-                  style: ElevatedButton.styleFrom(
+                TextButton(
+                  onPressed: () {},
+                  style: TextButton.styleFrom(
                     backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    foregroundColor: Colors.white,
                   ),
-                  child: const Text(
-                    'Download Voucher',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: const Text('Download Voucher'),
                 ),
-                Text(
-                  'Paid Date\n$paidDate',
-                  style: TextStyle(
-                    color: isPaid ? Colors.green : Colors.red,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                _buildColumn('Paid Date', paidDate,
+                    color: isPaid ? Colors.green : Colors.red),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // Helper Method to Build Details
-  Widget _buildDetail(String title, String value, {bool bold = false}) {
+  Widget _buildColumn(String title, String value, {Color color = Colors.black}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -105,13 +78,9 @@ class FeeVoucherWidget extends StatelessWidget {
           title,
           style: const TextStyle(fontSize: 12, color: Colors.grey),
         ),
-        const SizedBox(height: 2),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-          ),
+          style: TextStyle(fontSize: 14, color: color, fontWeight: FontWeight.bold),
         ),
       ],
     );

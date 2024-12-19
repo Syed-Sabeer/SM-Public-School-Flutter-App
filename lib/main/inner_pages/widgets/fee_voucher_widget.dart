@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class FeeVoucherWidget extends StatelessWidget {
-  final String invoiceDate;
+  // final String invoiceDate;
   final String dueDate;
   final String feeCycle;
   final String voucherAmount;
@@ -10,7 +10,7 @@ class FeeVoucherWidget extends StatelessWidget {
 
   const FeeVoucherWidget({
     super.key,
-    required this.invoiceDate,
+    // required this.invoiceDate,
     required this.dueDate,
     required this.feeCycle,
     required this.voucherAmount,
@@ -32,7 +32,8 @@ class FeeVoucherWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildColumn('Invoice Date', invoiceDate),
+                   _buildColumn('Fee Title', feeCycle),
+              //  _buildColumn('Invoice Date', invoiceDate),
                 _buildColumn('Due Date', dueDate),
               ],
             ),
@@ -42,15 +43,17 @@ class FeeVoucherWidget extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildColumn('Fee Cycle', feeCycle),
+             
                 _buildColumn('Voucher Amount', voucherAmount),
+   _buildColumn('Paid Date', paidDate,
+                    color: isPaid ? Colors.green : Colors.red),
               ],
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextButton(
                   onPressed: () {},
@@ -60,8 +63,7 @@ class FeeVoucherWidget extends StatelessWidget {
                   ),
                   child: const Text('Download Voucher'),
                 ),
-                _buildColumn('Paid Date', paidDate,
-                    color: isPaid ? Colors.green : Colors.red),
+             
               ],
             ),
           ),

@@ -26,42 +26,71 @@ Future<void> debugFirestore() async {
 
 
   // Fetch data for unpaid and paid vouchers
-  Future<List<Map<String, dynamic>>> fetchFeeVouchers() async {
-    try {
-      // Replace '74' with the logged-in student ID dynamically if needed
-      QuerySnapshot query = await _firestore
-          .collection('student_fees')
-     .where('student_id', isEqualTo: 74) // Use int instead of String
+ Future<List<Map<String, dynamic>>> fetchFeeVouchers() async {
+  try {
+    // Fetch student fee data
+    QuerySnapshot feeQuery = await _firestore
+        .collection('student_fees')
+        .where('student_id', isEqualTo: 74)
+        .get();
 
-          .get();
-
-      if (query.docs.isNotEmpty) {
-        final feeData = query.docs.first.data() as Map<String, dynamic>;
-        final statusList = feeData['status'] as List<dynamic>;
-        final recordList = feeData['record'] as List<dynamic>;
-        final dueList = feeData['due'] as List<dynamic>;
-        final datePaidList = feeData['date_paid'] as List<dynamic>;
-
-        List<Map<String, dynamic>> result = [];
-        for (int i = 0; i < statusList.length; i++) {
-          result.add({
-            'invoiceDate': '01 ${_getMonth(i)} 2024',
-            'dueDate': '22 ${_getMonth(i)} 2024',
-            'feeCycle': '${_getMonth(i)} 2024',
-            'voucherAmount': dueList[i] + recordList[i],
-            'paidDate': statusList[i] == 1
-                ? _formatDate(datePaidList[i])
-                : 'Not Paid',
-            'isPaid': statusList[i] == 1,
-          });
-        }
-        return result;
-      }
-      throw 'No data found';
-    } catch (e) {
-      throw 'Error fetching fee vouchers: $e';
+    if (feeQuery.docs.isEmpty) {
+      throw 'No student fee data found';
     }
+
+    // Extract student fee data
+    final feeData = feeQuery.docs.first.data() as Map<String, dynamic>;
+    final statusList = feeData['status'] as List<dynamic>;
+    final recordList = feeData['record'] as List<dynamic>;
+    final dueList = feeData['due'] as List<dynamic>;
+    final datePaidList = feeData['date_paid'] as List<dynamic>;
+    final invoiceDates = feeData['invoice_dates'] as List<dynamic>? ?? []; // Optional
+
+    // Fetch fee conditions dynamically
+    QuerySnapshot conditionQuery =
+        await _firestore.collection('fees_condition').get();
+
+    if (conditionQuery.docs.isEmpty) {
+      throw 'No fee condition data found';
+    }
+
+    // Map fee conditions to a usable structure
+    List<Map<String, dynamic>> conditions = conditionQuery.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .toList();
+
+    List<Map<String, dynamic>> result = [];
+    for (int i = 0; i < statusList.length; i++) {
+      // Dynamically get the relevant fee condition
+      final condition = conditions[i % conditions.length];
+      final int deadlineDays = condition['deadline_date'];
+      final int dueCharges = condition['due_charges'] ;
+
+      // Calculate due date dynamically
+      final invoiceDate = invoiceDates.isNotEmpty
+          ? (invoiceDates[i] as Timestamp).toDate()
+          : DateTime.now(); // Default to the current date if no invoice date exists
+      final dueDate = invoiceDate.add(Duration(days: deadlineDays));
+
+      result.add({
+        'invoiceDate': _formatDate(Timestamp.fromDate(invoiceDate)),
+        'dueDate': _formatDate(Timestamp.fromDate(dueDate)),
+        'feeCycle': '${_getMonth(invoiceDate.month - 1)} ${invoiceDate.year}',
+        'voucherAmount': dueList[i] + recordList[i] + (statusList[i] == 0 ? dueCharges : 0),
+        'paidDate': statusList[i] == 1
+            ? _formatDate(datePaidList[i])
+            : 'Not Paid',
+        'isPaid': statusList[i] == 1,
+      });
+    }
+
+    return result;
+  } catch (e) {
+    throw 'Error fetching fee vouchers: $e';
   }
+}
+
+
 
   // Helper to get month name
   String _getMonth(int index) {
@@ -120,7 +149,7 @@ Future<void> debugFirestore() async {
                 itemBuilder: (context, index) {
                   final voucher = unpaidVouchers[index];
                   return FeeVoucherWidget(
-                    invoiceDate: voucher['invoiceDate'],
+                    // invoiceDate: voucher['invoiceDate'],
                     dueDate: voucher['dueDate'],
                     feeCycle: voucher['feeCycle'],
                     voucherAmount: voucher['voucherAmount'].toString(),
@@ -135,7 +164,7 @@ Future<void> debugFirestore() async {
                 itemBuilder: (context, index) {
                   final voucher = paidVouchers[index];
                   return FeeVoucherWidget(
-                    invoiceDate: voucher['invoiceDate'],
+                    // invoiceDate: voucher['invoiceDate'],
                     dueDate: voucher['dueDate'],
                     feeCycle: voucher['feeCycle'],
                     voucherAmount: voucher['voucherAmount'].toString(),

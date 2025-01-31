@@ -154,9 +154,14 @@ void _navigateToFeature(BuildContext context, int index) {
       );
         break;
       case 2:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const HomeworkView()));
-        break;
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => HomeworkList(studentId: studentId),
+        ),
+    );
+    break;
+
       case 3:
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => const CommunicationView()));

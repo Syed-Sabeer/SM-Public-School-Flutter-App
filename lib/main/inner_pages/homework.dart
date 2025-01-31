@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../widgets/app_bar.dart';
+import './sub_inner_pages/homework_view.dart';
 
 class HomeworkList extends StatelessWidget {
   final String studentId;
@@ -47,6 +48,7 @@ class HomeworkList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       backgroundColor: Colors.white,
       appBar: const CustomAppBar(title: 'Homework', isDashboard: false),
       body: FutureBuilder<String>(
         future: fetchStudentClass(),
@@ -59,7 +61,7 @@ class HomeworkList extends StatelessWidget {
 
           final className = classSnapshot.data!;
 
-          return FutureBuilder<List<Map<String, dynamic>>>(
+          return FutureBuilder<List<Map<String, dynamic>>>( 
             future: fetchHomeworkDates(className),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -67,31 +69,43 @@ class HomeworkList extends StatelessWidget {
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('No homework available'));
+                return EmptyState();
               }
 
               final homeworkList = snapshot.data!;
 
-              return ListView.builder(
-                itemCount: homeworkList.length,
-                itemBuilder: (context, index) {
-                  final homework = homeworkList[index];
-                  final date = homework['createdAt'] as DateTime;
-                  final formattedDate = "${date.year}-${date.month}-${date.day}";
-                  final day = "${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.weekday - 1]}";
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: ListView.builder(
+                  itemCount: homeworkList.length,
+                  itemBuilder: (context, index) {
+                    final homework = homeworkList[index];
+                    final date = homework['createdAt'] as DateTime;
+                    final formattedDate = "${date.year}-${date.month}-${date.day}";
+                    final day = "${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.weekday - 1]}";
 
-                  return ListTile(
-                    title: Text("$formattedDate ($day)"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeworkView(homeworkId: homework['id']),
-                        ),
-                      );
-                    },
-                  );
-                },
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      elevation: 3.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16.0),
+                        title: Text("$formattedDate ($day)", style: TextStyle(fontWeight: FontWeight.bold)),
+                        trailing: Icon(Icons.arrow_forward_ios),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomeworkView(homeworkId: homework['id']),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
               );
             },
           );
@@ -101,62 +115,19 @@ class HomeworkList extends StatelessWidget {
   }
 }
 
-class HomeworkView extends StatelessWidget {
-  final String homeworkId;
-  const HomeworkView({super.key, required this.homeworkId});
-
-  Future<Map<String, dynamic>> fetchHomeworkDetails() async {
-    try {
-      final docSnapshot = await FirebaseFirestore.instance
-          .collection('class_homework')
-          .doc(homeworkId)
-          .get();
-
-      if (!docSnapshot.exists) {
-        throw Exception('Homework not found');
-      }
-
-      return docSnapshot.data()!;
-    } catch (e) {
-      throw Exception('Failed to load homework details: $e');
-    }
-  }
+class EmptyState extends StatelessWidget {
+  const EmptyState({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const CustomAppBar(title: 'Homework Details', isDashboard: false),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: fetchHomeworkDetails(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text('Homework details not found'));
-          }
-
-          final homework = snapshot.data!;
-          final subjects = List<String>.from(homework['subject'] ?? []);
-          final tasks = List<String>.from(homework['task'] ?? []);
-
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ListView.builder(
-              itemCount: subjects.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    title: Text(subjects[index]),
-                    subtitle: Text(tasks[index]),
-                  ),
-                );
-              },
-            ),
-          );
-        },
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.assignment_late, size: 50, color: Colors.grey),
+          SizedBox(height: 16),
+          Text('No homework available', style: TextStyle(fontSize: 18, color: Colors.grey)),
+        ],
       ),
     );
   }

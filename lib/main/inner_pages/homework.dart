@@ -33,7 +33,7 @@ class HomeworkList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       appBar: const CustomAppBar(title: 'Homework', isDashboard: false),
       body: FutureBuilder<String>(
         future: _studentFetchController.fetchStudentClass(studentId),
@@ -46,7 +46,7 @@ class HomeworkList extends StatelessWidget {
 
           final className = classSnapshot.data!;
 
-          return FutureBuilder<List<Map<String, dynamic>>>( 
+          return FutureBuilder<List<Map<String, dynamic>>>(
             future: fetchHomeworkDates(className),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,38 +59,79 @@ class HomeworkList extends StatelessWidget {
 
               final homeworkList = snapshot.data!;
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: ListView.builder(
-                  itemCount: homeworkList.length,
-                  itemBuilder: (context, index) {
-                    final homework = homeworkList[index];
-                    final date = homework['createdAt'] as DateTime;
-                    final formattedDate = "${date.year}-${date.month}-${date.day}";
-                    final day = "${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.weekday - 1]}";
+              return ListView.builder(
+                padding: const EdgeInsets.all(16.0),
+                itemCount: homeworkList.length,
+                itemBuilder: (context, index) {
+                  final homework = homeworkList[index];
+                  final date = homework['createdAt'] as DateTime;
+                  final formattedDate = "${date.year}-${date.month}-${date.day}";
+                  final day = "${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][date.weekday - 1]}";
 
-                    return Card(
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomeworkView(homeworkId: homework['id']),
+                        ),
+                      );
+                    },
+                    child: Container(
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
-                      elevation: 3.0,
-                      shape: RoundedRectangleBorder(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          colors: [Colors.blue.shade50, Colors.white],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            spreadRadius: 2,
+                            offset: const Offset(2, 4),
+                          ),
+                        ],
                       ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16.0),
-                        title: Text("$formattedDate ($day)", style: const TextStyle(fontWeight: FontWeight.bold)),
-                        trailing: const Icon(Icons.arrow_forward_ios),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomeworkView(homeworkId: homework['id']),
-                            ),
-                          );
-                        },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Homework Date & Day
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                day,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                formattedDate,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Forward Icon
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Colors.blue.shade700,
+                            size: 20,
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               );
             },
           );
@@ -109,7 +150,7 @@ class EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.assignment_late, size: 50, color: Colors.grey),
+          const Icon(Icons.assignment_late, size: 60, color: Colors.grey),
           const SizedBox(height: 16),
           const Text('No homework available', style: TextStyle(fontSize: 18, color: Colors.grey)),
         ],

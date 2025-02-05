@@ -52,20 +52,16 @@ class _NoticesViewState extends State<NoticesView> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : notices.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No notices found.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                  ),
-                )
+              ? const EmptyState()
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: const EdgeInsets.all(16.0),
                   itemCount: notices.length,
                   itemBuilder: (context, index) {
                     final notice = notices[index];
+                    final formattedDate = DateFormat('EEE, MMM d, yyyy').format(
+                      (notice['createdAt'] as Timestamp).toDate(),
+                    );
+
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -73,72 +69,93 @@ class _NoticesViewState extends State<NoticesView> {
                           MaterialPageRoute(
                             builder: (context) => NoticeDetailView(
                               subject: notice['subject'],
-                              date: (notice['createdAt'] as Timestamp)
-                                  .toDate(),
+                              date: (notice['createdAt'] as Timestamp).toDate(),
                               body: notice['body'],
                             ),
                           ),
                         );
                       },
-                      child: Card(
-                        elevation: 5,
-                        margin: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ),
-                        shape: RoundedRectangleBorder(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8.0),
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                        ),
-                        shadowColor: Colors.black26,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      notice['subject'] ?? 'No Subject',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    DateFormat('MMM dd, yyyy').format(
-                                      (notice['createdAt'] as Timestamp)
-                                          .toDate(),
-                                    ),
-                                    style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                notice['body'] ?? 'No Content',
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.black87,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
+                          gradient: LinearGradient(
+                            colors: [Colors.blue.shade50, Colors.white],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              spreadRadius: 2,
+                              offset: const Offset(2, 4),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Subject & Date
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    notice['subject'] ?? 'No Subject',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.blueAccent,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Text(
+                                  formattedDate,
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            // Notice Body Preview
+                            Text(
+                              notice['body'] ?? 'No Content',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.black87,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
                   },
                 ),
+    );
+  }
+}
+
+class EmptyState extends StatelessWidget {
+  const EmptyState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.notifications_off, size: 60, color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text('No notices found.', style: TextStyle(fontSize: 18, color: Colors.grey)),
+        ],
+      ),
     );
   }
 }

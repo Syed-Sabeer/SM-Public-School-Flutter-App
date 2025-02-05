@@ -53,12 +53,10 @@ class DatesheetView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
-           backgroundColor: Colors.white,
-      appBar: const CustomAppBar(title: 'Homework', isDashboard: false),
-      
-      body: FutureBuilder<List<Map<String, dynamic>>>(  
+      backgroundColor: Colors.white, // Always white background
+      appBar: const CustomAppBar(title: 'Date Sheet', isDashboard: false),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
         future: fetchDateSheet(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -76,57 +74,74 @@ class DatesheetView extends StatelessWidget {
             itemCount: dateSheet.length,
             itemBuilder: (context, index) {
               final item = dateSheet[index];
-              return Card(
+              return Container(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
-                elevation: 5.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    colors: [Colors.blue.shade50, Colors.white],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                      offset: const Offset(2, 4),
+                    ),
+                  ],
                 ),
-                color: Colors.blue.shade50,
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(20.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Date & Icon Row
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             formatDate(item['startTime']),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: Colors.blue,
+                              color: Colors.blue.shade700,
                             ),
                           ),
                           Icon(
-                            Icons.date_range,
-                            color: Colors.blue.shade700,
+                            Icons.date_range_rounded,
+                            color: Colors.blue.shade600,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 10),
+
+                      // Time Row
                       Row(
                         children: [
-                          Icon(Icons.access_time, color: Colors.black54),
-                          const SizedBox(width: 6),
+                          const Icon(Icons.access_time_filled, color: Colors.black54),
+                          const SizedBox(width: 8),
                           Text(
                             formatTimeRange(item['startTime'], item['endTime']),
                             style: const TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               fontWeight: FontWeight.w500,
                               color: Colors.black87,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 14),
+                      Divider(color: Colors.grey.shade300, thickness: 1),
+
+                      // Subject Name
                       Text(
                         item['subject'],
-                        style: const TextStyle(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Colors.blueGrey.shade900,
                         ),
                       ),
                     ],

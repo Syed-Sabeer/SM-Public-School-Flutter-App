@@ -75,81 +75,91 @@ class _TimeTableViewState extends State<TimeTableView>
                 
               ),
               
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: days.map((day) {
-                    final dayTimetable = timetable.where((entry) => entry['day'] == day).toList();
+            Expanded(
+  child: TabBarView(
+    controller: _tabController,
+    children: days.map((day) {
+      final dayTimetable = timetable.where((entry) => entry['day'] == day).toList();
 
-                    if (dayTimetable.isEmpty) {
-                      return const Center(child: Text('No timetable for this day.'));
-                    }
+      if (dayTimetable.isEmpty) {
+        return const Center(child: Text('No timetable for this day.'));
+      }
 
-                    return ListView(
-                      children: dayTimetable.expand((entry) {
-                        final subjects = entry['subjects'] as List<String>;
-                        final periodStart = entry['period_start'] as List<DateTime>;
-                        final periodEnd = entry['period_end'] as List<DateTime>;
+      return ListView(
+        padding: const EdgeInsets.symmetric(vertical: 10), // Added padding for top/bottom
+        children: dayTimetable.expand((entry) {
+          final subjects = entry['subjects'] as List<String>;
+          final periodStart = entry['period_start'] as List<DateTime>;
+          final periodEnd = entry['period_end'] as List<DateTime>;
 
-                        return List.generate(subjects.length, (i) {
-                          final formattedStart = DateFormat('hh:mm a').format(periodStart[i]);
-                          final formattedEnd = DateFormat('hh:mm a').format(periodEnd[i]);
+          return List.generate(subjects.length, (i) {
+            final formattedStart = DateFormat('hh:mm a').format(periodStart[i]);
+            final formattedEnd = DateFormat('hh:mm a').format(periodEnd[i]);
 
-                          return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                            elevation: 3,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+            return GestureDetector(
+              onTap: () {
+                // Handle item tap if needed
+              },
+              child: Card(
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                elevation: 5, // Increased shadow for better contrast
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16), // More rounded corners
+                ),
+                color: Colors.white,
+                shadowColor: Colors.black.withOpacity(0.1), // Soft shadow effect
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.book_rounded,
+                            color: Colors.blue.shade700,
+                            size: 28, // Larger icon for better clarity
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            subjects[i],
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600, // Bold text for subject name
+                              color: Colors.blueGrey.shade800,
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.book,
-                                        color: Colors.blue.shade700,
-                                        size: 24,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        subjects[i],
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.access_time,
-                                        color: Colors.green,
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '$formattedStart - $formattedEnd',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_rounded,
+                            color: Colors.green.shade600,
+                            size: 22, // Larger icon
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '$formattedStart - $formattedEnd',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade600, // Softer text for timing
                             ),
-                          );
-                        });
-                      }).toList(),
-                    );
-                  }).toList(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
+            );
+          });
+        }).toList(),
+      );
+    }).toList(),
+  ),
+),
+
             ],
           );
         },

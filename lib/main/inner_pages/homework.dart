@@ -2,28 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../widgets/app_bar.dart';
 import './sub_inner_pages/homework_view.dart';
+import './controller/class_fetch_controller.dart';
 
 class HomeworkList extends StatelessWidget {
   final String studentId;
-  const HomeworkList({super.key, required this.studentId});
+  HomeworkList({super.key, required this.studentId});
 
-  Future<String> fetchStudentClass() async {
-    try {
-      final studentSnapshot = await FirebaseFirestore.instance
-          .collection('student_detail')
-          .where('idNumber', isEqualTo: studentId)
-          .limit(1)
-          .get();
-
-      if (studentSnapshot.docs.isEmpty) {
-        throw Exception('Student not found');
-      }
-
-      return studentSnapshot.docs.first.data()['class'] as String;
-    } catch (e) {
-      throw Exception('Failed to load student class: $e');
-    }
-  }
+  final StudentFetchController _studentFetchController = StudentFetchController();
 
   Future<List<Map<String, dynamic>>> fetchHomeworkDates(String className) async {
     try {
@@ -51,7 +36,7 @@ class HomeworkList extends StatelessWidget {
        backgroundColor: Colors.white,
       appBar: const CustomAppBar(title: 'Homework', isDashboard: false),
       body: FutureBuilder<String>(
-        future: fetchStudentClass(),
+        future: _studentFetchController.fetchStudentClass(studentId),
         builder: (context, classSnapshot) {
           if (classSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -69,7 +54,7 @@ class HomeworkList extends StatelessWidget {
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return EmptyState();
+                return const EmptyState();
               }
 
               final homeworkList = snapshot.data!;
@@ -92,8 +77,8 @@ class HomeworkList extends StatelessWidget {
                       ),
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(16.0),
-                        title: Text("$formattedDate ($day)", style: TextStyle(fontWeight: FontWeight.bold)),
-                        trailing: Icon(Icons.arrow_forward_ios),
+                        title: Text("$formattedDate ($day)", style: const TextStyle(fontWeight: FontWeight.bold)),
+                        trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
                           Navigator.push(
                             context,
@@ -124,9 +109,9 @@ class EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.assignment_late, size: 50, color: Colors.grey),
-          SizedBox(height: 16),
-          Text('No homework available', style: TextStyle(fontSize: 18, color: Colors.grey)),
+          const Icon(Icons.assignment_late, size: 50, color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text('No homework available', style: TextStyle(fontSize: 18, color: Colors.grey)),
         ],
       ),
     );

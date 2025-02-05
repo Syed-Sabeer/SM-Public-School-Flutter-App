@@ -153,6 +153,15 @@ void _navigateToFeature(BuildContext context, int index) {
         ),
       );
         break;
+
+        case 9:
+       Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DatesheetView(), // Pass studentId
+        ),
+      );
+        break;
       case 2:
     Navigator.push(
         context,

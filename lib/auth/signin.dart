@@ -9,12 +9,12 @@ class SignInView extends StatefulWidget {
   @override
   _SignInViewState createState() => _SignInViewState();
 }
-
 class _SignInViewState extends State<SignInView> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = false; // For showing loading state
+  bool _obscurePassword = true; // For hiding/showing the password
 
   // Sign-in function
   Future<void> _signIn(BuildContext context) async {
@@ -126,11 +126,21 @@ class _SignInViewState extends State<SignInView> {
               const SizedBox(height: 20.0),
               TextField(
                 controller: _passwordController,
-                obscureText: true,
+                obscureText: _obscurePassword, // Toggle visibility
                 decoration: InputDecoration(
                   hintText: "Password",
                   prefixIcon: const Icon(Icons.lock, color: Colors.black54),
-                  suffixIcon: const Icon(Icons.visibility_off, color: Colors.black54),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.black54,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword; // Toggle visibility
+                      });
+                    },
+                  ),
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
@@ -149,7 +159,7 @@ class _SignInViewState extends State<SignInView> {
                           _signIn(context);
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF002D62), 
+                    backgroundColor: const Color(0xFF002D62),
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0),
